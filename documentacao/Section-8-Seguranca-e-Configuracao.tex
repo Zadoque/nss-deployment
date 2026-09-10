@@ -1,0 +1,27 @@
+\section{Segurança e Configuração}
+
+A segurança da aplicação é responsabilidade do backend Java. O frontend não deve possuir credenciais de banco de dados e não deve acessar diretamente serviços internos.
+
+\subsection{Segredos}
+
+Credenciais, chaves e tokens devem ser fornecidos por variáveis de ambiente, secrets do ambiente de execução ou mecanismo equivalente. Valores reais não devem ser versionados nos repositórios.
+
+\subsection{Banco de dados}
+
+O PostgreSQL deve ficar acessível diretamente apenas aos serviços que precisam dele. Em um ambiente integrado, o banco pode estar na rede interna do Compose sem necessidade de publicar sua porta para a máquina host.
+
+\subsection{Java}
+
+O backend deve aplicar autenticação e autorização antes de executar operações protegidas. Senhas devem ser armazenadas utilizando mecanismos de hashing apropriados, nunca em texto puro.
+
+\subsection{Python}
+
+A API de inspeção do pipeline deve receber proteção adequada quando exposta fora do ambiente local. Endpoints de debugging não devem expor informações desnecessárias em produção.
+
+\begin{regra}[Princípio de menor exposição]
+Um serviço deve expor apenas as portas e endpoints necessários ao seu papel. PostgreSQL e endpoints internos não devem ser tratados como APIs públicas.
+\end{regra}
+
+\subsection{Ambientes}
+
+As configurações devem ser separadas por ambiente. O repositório pode manter exemplos, como \texttt{.env.example}, mas não valores secretos reais.
