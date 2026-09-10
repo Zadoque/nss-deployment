@@ -1,0 +1,38 @@
+\section{Organização dos Repositórios}
+
+O projeto é mantido em três repositórios de aplicação. Esta decisão é intencional: permite que cada componente possua seu próprio ciclo de desenvolvimento, enquanto o repositório de deployment documenta e integra o sistema.
+
+\subsection{Repositórios}
+
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}p{5cm}X@{}}
+\toprule
+\textbf{Componente} & \textbf{Repositório atual} & \textbf{Responsabilidade} \\
+\midrule
+Java & \texttt{ArtursPereira/Site-Sala-de-Situa-o-de-Saude-Java} & Backend principal com Spring Boot. \\
+Python & \texttt{Zadoque/Nucleo-de-Situacao-De-Saude} & Pipeline de dados e processamento SINAN/PySUS. \\
+Deployment & \texttt{Zadoque/nss-deployment} & Documentação arquitetural e futura orquestração de integração. \\
+Frontend & Repositório do frontend & Interface web e consumo da API Java. \\
+\bottomrule
+\end{tabularx}
+
+\subsection{Responsabilidades da equipe atual}
+
+Atualmente o projeto é desenvolvido por três estagiários:
+
+\begin{itemize}
+    \item \textbf{Zadoque Carneiro}: arquitetura e documentação;
+    \item \textbf{Artur Pereira}: Java e Spring Boot;
+    \item \textbf{Gabriel Costa}: Python e pipeline de dados.
+\end{itemize}
+
+A organização em repositórios separados foi escolhida para continuar sendo adequada quando novos desenvolvedores e equipes forem incorporados ao projeto.
+
+\subsection{Por que não unificar os repositórios}
+
+Um monorepo seria tecnicamente possível, porém não é obrigatório para obter integração. Neste projeto, a separação permite que cada componente tenha seu próprio histórico, revisão, dependências e pipeline de CI/CD.
+
+O custo adicional dessa escolha é compensado por contratos claros entre componentes e por um ambiente de integração centralizado.
+
+\begin{explicacao}[Repositório de deployment]
+O repositório \texttt{nss-deployment} não deve concentrar código de negócio. Ele funciona como ponto de integração operacional, documentação e, quando necessário, configuração de ambientes que combinam as imagens dos três componentes.
+\end{explicacao}
