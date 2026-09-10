@@ -1,0 +1,50 @@
+\section{Observabilidade e Debugging}
+
+A arquitetura foi desenhada para permitir localizar uma inconsistência sem depender exclusivamente da inspeção manual do banco de dados.
+
+\subsection{Cadeia de diagnóstico}
+
+Quando um valor exibido no frontend parecer incorreto, a investigação deve seguir a cadeia:
+
+\begin{enumerate}
+    \item verificar a resposta da API Java;
+    \item comparar com a consulta equivalente no PostgreSQL;
+    \item comparar o PostgreSQL com o Gold produzido pelo pipeline;
+    \item comparar o Gold com o Silver;
+    \item comparar o Silver com o Bronze;
+    \item verificar a origem SINAN/PySUS quando necessário.
+\end{enumerate}
+
+\placeholderfigure{cadeia-debug}{6cm}{Cadeia de diagnóstico: frontend, Java, PostgreSQL e etapas do pipeline.}
+
+\subsection{API de inspeção}
+
+A API de inspeção do Python pode disponibilizar consultas sobre os artefatos Gold. Ela deve ser tratada como ferramenta operacional e de desenvolvimento, e não como o contrato público da aplicação.
+
+Isso permite uma comparação rápida:
+
+\begin{center}
+\texttt{Gold Python} $\leftrightarrow$ \texttt{PostgreSQL} $\leftrightarrow$ \texttt{Java API} $\leftrightarrow$ \texttt{Frontend}
+\end{center}
+
+\subsection{Logs}
+
+Os três componentes devem produzir logs suficientes para identificar uma execução sem registrar dados sensíveis desnecessariamente. O pipeline deve registrar, no mínimo, identificadores de execução, origem, período processado, quantidade de registros e resultado das validações.
+
+O Java deve registrar requisições relevantes, falhas de integração e erros de aplicação sem registrar credenciais ou informações sensíveis.
+
+\subsection{Validação automatizada}
+
+Sempre que possível, a comparação entre etapas deve ser automatizada. Exemplos de invariantes:
+
+\begin{itemize}
+    \item schema esperado;
+    \item quantidade mínima ou esperada de registros;
+    \item ausência de chaves geográficas inválidas;
+    \item consistência de totais;
+    \item equivalência entre dados publicados no PostgreSQL e artefatos Gold.
+\end{itemize}
+
+\begin{regra}[Debug por camadas]
+A existência de um valor incorreto no frontend não deve levar imediatamente à conclusão de que o frontend está errado. Cada camada deve possuir meios próprios de inspeção para reduzir sistematicamente o espaço de busca do problema.
+\end{regra}
