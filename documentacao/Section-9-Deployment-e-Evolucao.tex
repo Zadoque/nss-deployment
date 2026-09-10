@@ -1,0 +1,44 @@
+\section{Deployment e Evolução}
+
+A estratégia de deployment deve preservar a independência dos três repositórios e, ao mesmo tempo, permitir a execução integrada do sistema.
+
+\subsection{Desenvolvimento local}
+
+Durante o desenvolvimento, as imagens podem ser construídas localmente a partir dos três repositórios. Um Compose de integração deve conectar frontend, Java, pipeline e PostgreSQL em uma rede comum.
+
+\subsection{Integração contínua}
+
+Em uma evolução futura, cada repositório poderá possuir seu próprio pipeline de CI/CD:
+
+\begin{lstlisting}
+commit
+  |
+  v
+CI -> testes -> build -> imagem Docker -> registry
+\end{lstlisting}
+
+O repositório de deployment poderá selecionar versões específicas das imagens para cada ambiente.
+
+\subsection{Versionamento das imagens}
+
+É recomendável utilizar tags imutáveis ou identificáveis, como versões semânticas ou SHA do commit. Um ambiente integrado pode então combinar, por exemplo, versões diferentes do frontend, Java e pipeline de maneira explícita.
+
+\subsection{Evolução da equipe}
+
+A separação por repositórios permite que equipes futuras assumam componentes diferentes. Para evitar que a separação gere acoplamento descontrolado, devem ser mantidos:
+
+\begin{itemize}
+    \item contratos documentados;
+    \item migrations versionadas;
+    \item testes de integração;
+    \item convenções de versionamento;
+    \item documentação centralizada neste repositório.
+\end{itemize}
+
+\subsection{Evoluções futuras}
+
+A arquitetura pode evoluir gradualmente para mecanismos como registry privado, CI/CD, observabilidade centralizada, jobs agendados e ambientes de staging. Essas ferramentas devem ser adotadas quando houver necessidade operacional real, evitando complexidade prematura.
+
+\begin{explicacao}[Princípio de evolução incremental]
+A arquitetura atual deve resolver o problema presente sem impedir crescimento futuro. Novas ferramentas e serviços devem ser introduzidos quando reduzirem um problema concreto de operação, manutenção ou escala.
+\end{explicacao}
