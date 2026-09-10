@@ -11,32 +11,31 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f {
         pkgs = import nixpkgs { inherit system; };
       });
+      texliveFor = pkgs: pkgs.texlive.combine {
+        inherit (pkgs.texlive)
+          scheme-small
+          babel-portuges
+          booktabs
+          enumitem
+          etoolbox
+          fancyhdr
+          float
+          geometry
+          lastpage
+          listings
+          lmodern
+          microtype
+          setspace
+          tcolorbox
+          tools
+          xcolor
+          hyperref
+          bookmark;
+      };
     in {
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
-          packages = [
-            (pkgs.texlive.combine {
-              inherit (pkgs.texlive)
-                scheme-small
-                babel-portuges
-                booktabs
-                enumitem
-                etoolbox
-                fancyhdr
-                float
-                geometry
-                lastpage
-                listings
-                lmodern
-                microtype
-                setspace
-                tcolorbox
-                tools
-                xcolor
-                hyperref
-                bookmark;
-            })
-          ];
+          packages = [ (texliveFor pkgs) pkgs.gnumake ];
 
           shellHook = ''
             echo "NSS Documentation"
@@ -47,28 +46,7 @@
       });
 
       packages = forAllSystems ({ pkgs }:
-        let
-          tex = pkgs.texlive.combine {
-            inherit (pkgs.texlive)
-              scheme-small
-              babel-portuges
-              booktabs
-              enumitem
-              etoolbox
-              fancyhdr
-              float
-              geometry
-              lastpage
-              listings
-              lmodern
-              microtype
-              setspace
-              tcolorbox
-              tools
-              xcolor
-              hyperref
-              bookmark;
-          };
+        let tex = texliveFor pkgs;
         in {
           default = pkgs.stdenvNoCC.mkDerivation {
             pname = "nss-documentacao";
@@ -90,33 +68,12 @@
 
       apps = forAllSystems ({ pkgs }:
         let
-          tex = pkgs.texlive.combine {
-            inherit (pkgs.texlive)
-              scheme-small
-              babel-portuges
-              booktabs
-              enumitem
-              etoolbox
-              fancyhdr
-              float
-              geometry
-              lastpage
-              listings
-              lmodern
-              microtype
-              setspace
-              tcolorbox
-              tools
-              xcolor
-              hyperref
-              bookmark;
-          };
+          tex = texliveFor pkgs;
           compile = pkgs.writeShellApplication {
             name = "compile-nss-documentacao";
             runtimeInputs = [ tex ];
             text = ''
               set -euo pipefail
-              cd "$(dirname "$0")/.." 2>/dev/null || true
               pdflatex -interaction=nonstopmode -halt-on-error main.tex
               pdflatex -interaction=nonstopmode -halt-on-error main.tex
               echo "PDF gerado: main.pdf"
