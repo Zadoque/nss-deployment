@@ -11,27 +11,28 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f {
         pkgs = import nixpkgs { inherit system; };
       });
-      texliveFor = pkgs: pkgs.texlive.combine {
-        inherit (pkgs.texlive)
-          scheme-small
-          babel-portuges
-          booktabs
-          enumitem
-          etoolbox
-          fancyhdr
-          float
-          geometry
-          lastpage
-          listings
-          lmodern
-          microtype
-          setspace
-          tcolorbox
-          tools
-          xcolor
-          hyperref
-          bookmark;
-      };
+
+      # Nixpkgs atual recomenda os ambientes TeX Live predefinidos
+      # (texliveSmall/texliveBasic) com pacotes adicionais via withPackages,
+      # em vez de texlive.combine.
+      texliveFor = pkgs: pkgs.texliveSmall.withPackages (ps: with ps; [
+        babel-portuges
+        booktabs
+        enumitem
+        etoolbox
+        fancyhdr
+        float
+        geometry
+        lastpage
+        listings
+        microtype
+        setspace
+        tcolorbox
+        tools
+        xcolor
+        hyperref
+        bookmark
+      ]);
     in {
       devShells = forAllSystems ({ pkgs }: {
         default = pkgs.mkShell {
