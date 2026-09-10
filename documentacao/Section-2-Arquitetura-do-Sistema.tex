@@ -1,0 +1,48 @@
+\section{Arquitetura do Sistema}
+
+A arquitetura do NSS utiliza quatro componentes executados separadamente: frontend, backend Java/Spring Boot, pipeline Python e PostgreSQL.
+
+\placeholderfigure{arquitetura-alto-nivel}{7cm}{Arquitetura de alto nível do Núcleo de Situação de Saúde.}
+
+\subsection{Fluxo de consulta}
+
+O fluxo normal de uma consulta é:
+
+\begin{enumerate}
+    \item o usuário interage com o frontend;
+    \item o frontend envia uma requisição HTTP para a API Java;
+    \item o Java autentica e autoriza a operação, quando aplicável;
+    \item a camada de serviço aplica as regras de negócio;
+    \item o backend consulta o PostgreSQL;
+    \item o resultado é transformado em DTO e retornado ao frontend.
+\end{enumerate}
+
+\subsection{Fluxo de atualização de dados}
+
+A atualização dos dados ocorre separadamente do fluxo de consulta:
+
+\begin{enumerate}
+    \item o pipeline Python obtém dados do SINAN por meio do PySUS;
+    \item os dados brutos são preservados em Bronze;
+    \item transformações e padronizações produzem Silver;
+    \item agregações necessárias à aplicação produzem Gold;
+    \item os resultados são validados;
+    \item os dados consolidados são persistidos no PostgreSQL.
+\end{enumerate}
+
+\begin{regra}[Pipeline fora do caminho crítico de consulta]
+Uma consulta do usuário não deve depender de uma nova coleta ou processamento do SINAN. A aplicação consulta dados já persistidos e validados no PostgreSQL.
+\end{regra}
+
+\subsection{Responsabilidades}
+
+\begin{tabularx}{\textwidth}{@{}p{3.2cm}X@{}}
+\toprule
+\textbf{Componente} & \textbf{Responsabilidade} \\
+\midrule
+Frontend & Interface, visualizações, mapas, filtros e interação com o usuário. \\
+Java/Spring Boot & API REST, autenticação, autorização, regras de negócio e acesso ao banco. \\
+Python/Pipeline & Ingestão, transformação, agregação, validação e atualização dos dados. \\
+PostgreSQL & Persistência compartilhada dos dados consolidados e das informações da aplicação. \\
+\bottomrule
+\end{tabularx}
